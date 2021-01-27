@@ -21,8 +21,6 @@ import org.apache.dubbo.common.extension.SPI;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.common.utils.ConcurrentHashSet;
-
-import com.alibaba.spring.util.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -66,7 +64,7 @@ public class SpringExtensionFactory implements ExtensionFactory {
         }
 
         for (ApplicationContext context : CONTEXTS) {
-            T bean = BeanFactoryUtils.getOptionalBean(context, name, type);
+            T bean = findBean(context, name, type);
             if (bean != null) {
                 return bean;
             }
@@ -74,6 +72,16 @@ public class SpringExtensionFactory implements ExtensionFactory {
 
         //logger.warn("No spring extension (bean) named:" + name + ", try to find an extension (bean) of type " + type.getName());
 
+        return null;
+    }
+
+    private <T> T findBean(ApplicationContext context, String beanName, Class<T> beanType) {
+        Object bean = context.getBean(beanName);
+        if (beanType.isAssignableFrom(bean.getClass())) {
+            return (T) bean;
+        }
+        logger.warn(String.format("bean type not match, name: %s, expected type: %s, actual type: %s",
+                beanName, beanType.getName(), bean.getClass().getName()));
         return null;
     }
 }
