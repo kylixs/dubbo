@@ -39,6 +39,7 @@ import static com.alibaba.spring.util.AnnotationUtils.getAttribute;
 import static com.alibaba.spring.util.AnnotationUtils.getAttributes;
 import static com.alibaba.spring.util.ObjectUtils.of;
 import static org.apache.dubbo.config.spring.util.DubboAnnotationUtils.resolveServiceInterfaceClass;
+import static org.apache.dubbo.config.spring.util.DubboBeanUtils.getOptionalBean;
 import static org.springframework.core.annotation.AnnotationAttributes.fromMap;
 import static org.springframework.util.StringUtils.commaDelimitedListToStringArray;
 
@@ -81,7 +82,7 @@ class ReferenceBeanBuilder extends AnnotatedInterfaceConfigBeanBuilder<Reference
 
         String consumerBeanName = getAttribute(attributes, "consumer");
 
-        ConsumerConfig consumerConfig = DubboBeanUtils.getBean(applicationContext, consumerBeanName, ConsumerConfig.class);
+        ConsumerConfig consumerConfig = getOptionalBean(applicationContext, consumerBeanName, ConsumerConfig.class);
 
         referenceBean.setConsumer(consumerConfig);
 

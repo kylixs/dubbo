@@ -26,11 +26,13 @@ import org.apache.dubbo.config.spring.context.DubboApplicationListenerRegistrar;
 import org.apache.dubbo.config.spring.context.DubboBootstrapApplicationListener;
 import org.apache.dubbo.config.spring.context.DubboLifecycleComponentApplicationListener;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.alibaba.spring.util.BeanRegistrar.registerInfrastructureBean;
@@ -92,34 +94,40 @@ public abstract class DubboBeanUtils {
 
     /**
      * Get bean by name and type
+     *
      * @param beanFactory
      * @param beanName
      * @param beanType
      * @param <T>
      * @return
      */
-    public static <T> T getBean(ListableBeanFactory beanFactory, String beanName, Class<T> beanType) {
-        Object bean = null;
+    public static <T> T getOptionalBean(ListableBeanFactory beanFactory, String beanName, Class<T> beanType) {
+        List<String> beanNames = Arrays.asList(beanFactory.getBeanDefinitionNames());
+        if (!beanNames.contains(beanName)) {
+            return null;
+        }
+        T bean = null;
         try {
-            bean = beanFactory.getBean(beanName);
+            bean = beanFactory.getBean(beanName, beanType);
         } catch (NoSuchBeanDefinitionException e) {
             // ignore NoSuchBeanDefinitionException
+        } catch (BeanNotOfRequiredTypeException e) {
+            // ignore BeanNotOfRequiredTypeException
+            logger.warn(String.format("bean type not match, name: %s, expected type: %s, actual type: %s",
+                    beanName, beanType.getName(), e.getActualType().getName()));
         } catch (BeansException e) {
             logger.warn(String.format("get bean failure, name: %s, type: %s", beanName, beanType.getName()), e);
         }
-        if (bean == null) {
-            return null;
-        }
-        if (beanType.isAssignableFrom(bean.getClass())) {
-            return (T) bean;
-        }
-        logger.warn(String.format("bean type not match, name: %s, expected type: %s, actual type: %s",
-                beanName, beanType.getName(), bean.getClass().getName()));
-        return null;
+        return bean;
+    }
+
+    public static <T> T getBean(ListableBeanFactory beanFactory, String beanName, Class<T> beanType) {
+        return beanFactory.getBean(beanName, beanType);
     }
 
     /**
-     * Get beans by names and filter by type
+     * Get beans by names and type
+     *
      * @param beanFactory
      * @param beanNames
      * @param beanType

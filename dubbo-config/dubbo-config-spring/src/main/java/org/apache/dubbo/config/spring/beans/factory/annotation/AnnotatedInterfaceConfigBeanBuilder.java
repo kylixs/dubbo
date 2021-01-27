@@ -31,6 +31,9 @@ import org.springframework.util.Assert;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import static org.apache.dubbo.config.spring.util.DubboBeanUtils.getBeans;
+import static org.apache.dubbo.config.spring.util.DubboBeanUtils.getOptionalBean;
+
 /**
  * An Abstract Builder to build {@link AbstractInterfaceConfig Interface Config} Bean that annotated
  * some {@link Annotation annotation}.
@@ -120,7 +123,7 @@ public abstract class AnnotatedInterfaceConfigBeanBuilder<C extends AbstractInte
 
         String[] registryConfigBeanIds = resolveRegistryConfigBeanNames(attributes);
 
-        List<RegistryConfig> registryConfigs = DubboBeanUtils.getBeans(applicationContext, registryConfigBeanIds, RegistryConfig.class);
+        List<RegistryConfig> registryConfigs = getBeans(applicationContext, registryConfigBeanIds, RegistryConfig.class);
 
         configBean.setRegistries(registryConfigs);
 
@@ -130,7 +133,7 @@ public abstract class AnnotatedInterfaceConfigBeanBuilder<C extends AbstractInte
 
         String monitorBeanName = resolveMonitorConfigBeanName(attributes);
 
-        MonitorConfig monitorConfig = DubboBeanUtils.getBean(applicationContext, monitorBeanName, MonitorConfig.class);
+        MonitorConfig monitorConfig = getOptionalBean(applicationContext, monitorBeanName, MonitorConfig.class);
 
         configBean.setMonitor(monitorConfig);
 
@@ -141,7 +144,7 @@ public abstract class AnnotatedInterfaceConfigBeanBuilder<C extends AbstractInte
         String applicationConfigBeanName = resolveApplicationConfigBeanName(attributes);
 
         ApplicationConfig applicationConfig =
-                DubboBeanUtils.getBean(applicationContext, applicationConfigBeanName, ApplicationConfig.class);
+                getOptionalBean(applicationContext, applicationConfigBeanName, ApplicationConfig.class);
 
         configBean.setApplication(applicationConfig);
 
@@ -152,7 +155,7 @@ public abstract class AnnotatedInterfaceConfigBeanBuilder<C extends AbstractInte
         String moduleConfigBeanName = resolveModuleConfigBeanName(attributes);
 
         ModuleConfig moduleConfig =
-                DubboBeanUtils.getBean(applicationContext, moduleConfigBeanName, ModuleConfig.class);
+                getOptionalBean(applicationContext, moduleConfigBeanName, ModuleConfig.class);
 
         configBean.setModule(moduleConfig);
 
