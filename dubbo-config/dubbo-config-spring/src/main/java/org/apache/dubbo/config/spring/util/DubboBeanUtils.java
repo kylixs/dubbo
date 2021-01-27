@@ -41,9 +41,9 @@ import static org.springframework.util.ObjectUtils.isEmpty;
  *
  * @since 2.7.6
  */
-public interface DubboBeanUtils {
+public abstract class DubboBeanUtils {
 
-    Logger logger = LoggerFactory.getLogger(DubboBeanUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(DubboBeanUtils.class);
 
     /**
      * Register the common beans
@@ -55,7 +55,7 @@ public interface DubboBeanUtils {
      * @see DubboLifecycleComponentApplicationListener
      * @see DubboBootstrapApplicationListener
      */
-    static void registerCommonBeans(BeanDefinitionRegistry registry) {
+    public static void registerCommonBeans(BeanDefinitionRegistry registry) {
 
         // Since 2.5.7 Register @Reference Annotation Bean Processor as an infrastructure Bean
         registerInfrastructureBean(registry, ReferenceAnnotationBeanPostProcessor.BEAN_NAME,
@@ -96,7 +96,7 @@ public interface DubboBeanUtils {
      * @param <T>
      * @return
      */
-    static <T> T getBean(ListableBeanFactory beanFactory, String beanName, Class<T> beanType) {
+    public static <T> T getBean(ListableBeanFactory beanFactory, String beanName, Class<T> beanType) {
         Object bean = beanFactory.getBean(beanName);
         if (bean == null) {
             return null;
@@ -117,7 +117,7 @@ public interface DubboBeanUtils {
      * @param <T>
      * @return
      */
-    static <T> List<T> getBeans(ListableBeanFactory beanFactory, String[] beanNames, Class<T> beanType) {
+    public static <T> List<T> getBeans(ListableBeanFactory beanFactory, String[] beanNames, Class<T> beanType) {
         if (isEmpty(beanNames)) {
             return emptyList();
         }
