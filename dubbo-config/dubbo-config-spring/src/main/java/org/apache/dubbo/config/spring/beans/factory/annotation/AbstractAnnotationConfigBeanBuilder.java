@@ -24,14 +24,12 @@ import org.apache.dubbo.config.RegistryConfig;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.dubbo.config.spring.util.DubboBeanUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
-
-import static com.alibaba.spring.util.BeanFactoryUtils.getBeans;
-import static com.alibaba.spring.util.BeanFactoryUtils.getOptionalBean;
 
 /**
  * Abstract Configurable {@link Annotation} Bean Builder
@@ -122,7 +120,7 @@ abstract class AbstractAnnotationConfigBeanBuilder<A extends Annotation, B exten
 
         String[] registryConfigBeanIds = resolveRegistryConfigBeanNames(annotation);
 
-        List<RegistryConfig> registryConfigs = getBeans(applicationContext, registryConfigBeanIds, RegistryConfig.class);
+        List<RegistryConfig> registryConfigs = DubboBeanUtils.getBeans(applicationContext, registryConfigBeanIds, RegistryConfig.class);
 
         bean.setRegistries(registryConfigs);
 
@@ -132,7 +130,7 @@ abstract class AbstractAnnotationConfigBeanBuilder<A extends Annotation, B exten
 
         String monitorBeanName = resolveMonitorConfigBeanName(annotation);
 
-        MonitorConfig monitorConfig = getOptionalBean(applicationContext, monitorBeanName, MonitorConfig.class);
+        MonitorConfig monitorConfig = DubboBeanUtils.getBean(applicationContext, monitorBeanName, MonitorConfig.class);
 
         bean.setMonitor(monitorConfig);
 
@@ -143,7 +141,7 @@ abstract class AbstractAnnotationConfigBeanBuilder<A extends Annotation, B exten
         String applicationConfigBeanName = resolveApplicationConfigBeanName(annotation);
 
         ApplicationConfig applicationConfig =
-                getOptionalBean(applicationContext, applicationConfigBeanName, ApplicationConfig.class);
+                DubboBeanUtils.getBean(applicationContext, applicationConfigBeanName, ApplicationConfig.class);
 
         bean.setApplication(applicationConfig);
 
@@ -154,7 +152,7 @@ abstract class AbstractAnnotationConfigBeanBuilder<A extends Annotation, B exten
         String moduleConfigBeanName = resolveModuleConfigBeanName(annotation);
 
         ModuleConfig moduleConfig =
-                getOptionalBean(applicationContext, moduleConfigBeanName, ModuleConfig.class);
+                DubboBeanUtils.getBean(applicationContext, moduleConfigBeanName, ModuleConfig.class);
 
         bean.setModule(moduleConfig);
 

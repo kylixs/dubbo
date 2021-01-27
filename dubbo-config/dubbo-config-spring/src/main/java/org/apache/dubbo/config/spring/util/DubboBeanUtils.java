@@ -16,6 +16,8 @@
  */
 package org.apache.dubbo.config.spring.util;
 
+import org.apache.dubbo.common.logger.Logger;
+import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.config.spring.beans.factory.annotation.DubboConfigAliasPostProcessor;
 import org.apache.dubbo.config.spring.beans.factory.annotation.ReferenceAnnotationBeanPostProcessor;
 import org.apache.dubbo.config.spring.beans.factory.config.DubboConfigDefaultPropertyValueBeanPostProcessor;
@@ -23,10 +25,16 @@ import org.apache.dubbo.config.spring.beans.factory.config.DubboConfigEarlyIniti
 import org.apache.dubbo.config.spring.context.DubboApplicationListenerRegistrar;
 import org.apache.dubbo.config.spring.context.DubboBootstrapApplicationListener;
 import org.apache.dubbo.config.spring.context.DubboLifecycleComponentApplicationListener;
-
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.alibaba.spring.util.BeanRegistrar.registerInfrastructureBean;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+import static org.springframework.util.ObjectUtils.isEmpty;
 
 /**
  * Dubbo Bean utilities class
@@ -34,6 +42,8 @@ import static com.alibaba.spring.util.BeanRegistrar.registerInfrastructureBean;
  * @since 2.7.6
  */
 public interface DubboBeanUtils {
+
+    Logger logger = LoggerFactory.getLogger(DubboBeanUtils.class);
 
     /**
      * Register the common beans
@@ -76,5 +86,49 @@ public interface DubboBeanUtils {
         // Since 2.7.9 Register DubboConfigEarlyInitializationPostProcessor as an infrastructure Bean
         registerInfrastructureBean(registry, DubboConfigEarlyInitializationPostProcessor.BEAN_NAME,
                 DubboConfigEarlyInitializationPostProcessor.class);
+    }
+
+    /**
+     * Get bean by name and type
+     * @param beanFactory
+     * @param beanName
+     * @param beanType
+     * @param <T>
+     * @return
+     */
+    static <T> T getBean(ListableBeanFactory beanFactory, String beanName, Class<T> beanType) {
+        Object bean = beanFactory.getBean(beanName);
+        if (bean == null) {
+            return null;
+        }
+        if (beanType.isAssignableFrom(bean.getClass())) {
+            return (T) bean;
+        }
+        logger.warn(String.format("bean type not match, name: %s, expected type: %s, actual type: %s",
+                beanName, beanType.getName(), bean.getClass().getName()));
+        return null;
+    }
+
+    /**
+     * Get beans by names and filter by type
+     * @param beanFactory
+     * @param beanNames
+     * @param beanType
+     * @param <T>
+     * @return
+     */
+    static <T> List<T> getBeans(ListableBeanFactory beanFactory, String[] beanNames, Class<T> beanType) {
+        if (isEmpty(beanNames)) {
+            return emptyList();
+        }
+
+        List<T> beans = new ArrayList<T>(beanNames.length);
+        for (String beanName : beanNames) {
+            T bean = getBean(beanFactory, beanName, beanType);
+            if (bean != null) {
+                beans.add(bean);
+            }
+        }
+        return unmodifiableList(beans);
     }
 }

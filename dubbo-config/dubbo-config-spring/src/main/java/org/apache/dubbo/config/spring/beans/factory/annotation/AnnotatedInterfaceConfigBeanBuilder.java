@@ -16,23 +16,20 @@
  */
 package org.apache.dubbo.config.spring.beans.factory.annotation;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.dubbo.config.AbstractInterfaceConfig;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ModuleConfig;
 import org.apache.dubbo.config.MonitorConfig;
 import org.apache.dubbo.config.RegistryConfig;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.dubbo.config.spring.util.DubboBeanUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.util.Assert;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
-
-import static com.alibaba.spring.util.BeanFactoryUtils.getBeans;
-import static com.alibaba.spring.util.BeanFactoryUtils.getOptionalBean;
 
 /**
  * An Abstract Builder to build {@link AbstractInterfaceConfig Interface Config} Bean that annotated
@@ -123,7 +120,7 @@ public abstract class AnnotatedInterfaceConfigBeanBuilder<C extends AbstractInte
 
         String[] registryConfigBeanIds = resolveRegistryConfigBeanNames(attributes);
 
-        List<RegistryConfig> registryConfigs = getBeans(applicationContext, registryConfigBeanIds, RegistryConfig.class);
+        List<RegistryConfig> registryConfigs = DubboBeanUtils.getBeans(applicationContext, registryConfigBeanIds, RegistryConfig.class);
 
         configBean.setRegistries(registryConfigs);
 
@@ -133,7 +130,7 @@ public abstract class AnnotatedInterfaceConfigBeanBuilder<C extends AbstractInte
 
         String monitorBeanName = resolveMonitorConfigBeanName(attributes);
 
-        MonitorConfig monitorConfig = getOptionalBean(applicationContext, monitorBeanName, MonitorConfig.class);
+        MonitorConfig monitorConfig = DubboBeanUtils.getBean(applicationContext, monitorBeanName, MonitorConfig.class);
 
         configBean.setMonitor(monitorConfig);
 
@@ -144,7 +141,7 @@ public abstract class AnnotatedInterfaceConfigBeanBuilder<C extends AbstractInte
         String applicationConfigBeanName = resolveApplicationConfigBeanName(attributes);
 
         ApplicationConfig applicationConfig =
-                getOptionalBean(applicationContext, applicationConfigBeanName, ApplicationConfig.class);
+                DubboBeanUtils.getBean(applicationContext, applicationConfigBeanName, ApplicationConfig.class);
 
         configBean.setApplication(applicationConfig);
 
@@ -155,7 +152,7 @@ public abstract class AnnotatedInterfaceConfigBeanBuilder<C extends AbstractInte
         String moduleConfigBeanName = resolveModuleConfigBeanName(attributes);
 
         ModuleConfig moduleConfig =
-                getOptionalBean(applicationContext, moduleConfigBeanName, ModuleConfig.class);
+                DubboBeanUtils.getBean(applicationContext, moduleConfigBeanName, ModuleConfig.class);
 
         configBean.setModule(moduleConfig);
 
