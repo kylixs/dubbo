@@ -25,7 +25,9 @@ import org.apache.dubbo.config.spring.beans.factory.config.DubboConfigEarlyIniti
 import org.apache.dubbo.config.spring.context.DubboApplicationListenerRegistrar;
 import org.apache.dubbo.config.spring.context.DubboBootstrapApplicationListener;
 import org.apache.dubbo.config.spring.context.DubboLifecycleComponentApplicationListener;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import java.util.ArrayList;
@@ -97,7 +99,14 @@ public abstract class DubboBeanUtils {
      * @return
      */
     public static <T> T getBean(ListableBeanFactory beanFactory, String beanName, Class<T> beanType) {
-        Object bean = beanFactory.getBean(beanName);
+        Object bean = null;
+        try {
+            bean = beanFactory.getBean(beanName);
+        } catch (NoSuchBeanDefinitionException e) {
+            // ignore NoSuchBeanDefinitionException
+        } catch (BeansException e) {
+            logger.warn(String.format("get bean failure, name: %s, type: %s", beanName, beanType.getName()), e);
+        }
         if (bean == null) {
             return null;
         }
